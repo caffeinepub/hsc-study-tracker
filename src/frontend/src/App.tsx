@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
+  AlarmClock,
   BarChart3,
   BookOpen,
   CalendarDays,
@@ -9,11 +10,17 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  ListTodo,
   Target,
+  Timer,
   XCircle,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
+import CalendarView from "./components/CalendarView";
+import CountdownTimer from "./components/CountdownTimer";
+import DailyRoutine from "./components/DailyRoutine";
+import Stopwatch from "./components/Stopwatch";
 import { useStudyTracker } from "./hooks/useStudyTracker";
 import type { TaskStatus } from "./hooks/useStudyTracker";
 import {
@@ -31,6 +38,16 @@ const QUOTES = [
   "তুমি পারবে, শুধু চেষ্টা করে যাও।",
   "একটু একটু করে এগিয়ে যাও, লক্ষ্যে পৌঁছাবেই।",
   "পরিশ্রমই সাফল্যের চাবিকাঠি।",
+];
+
+type Tab = "study" | "routine" | "calendar" | "stopwatch" | "countdown";
+
+const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
+  { id: "study", label: "পড়ার পরিকল্পনা", icon: <BookOpen size={16} /> },
+  { id: "routine", label: "রুটিন", icon: <ListTodo size={16} /> },
+  { id: "calendar", label: "ক্যালেন্ডার", icon: <CalendarDays size={16} /> },
+  { id: "stopwatch", label: "Stopwatch", icon: <Timer size={16} /> },
+  { id: "countdown", label: "Countdown", icon: <AlarmClock size={16} /> },
 ];
 
 function getDayDate(dayIndex: number): string {
@@ -139,6 +156,7 @@ export default function App() {
   const { todayIndex, markCompleted, getDayStatuses, getOverallStats } =
     useStudyTracker();
   const [viewDay, setViewDay] = useState(todayIndex);
+  const [activeTab, setActiveTab] = useState<Tab>("study");
   const quoteIndex = useMemo(
     () => Math.floor(Math.random() * QUOTES.length),
     [],
@@ -165,7 +183,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="bg-primary text-primary-foreground shadow-md">
+      <header className="bg-primary text-primary-foreground shadow-md sticky top-0 z-30">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
           <BookOpen size={28} className="flex-shrink-0" />
           <div>
@@ -196,225 +214,316 @@ export default function App() {
             </span>
           </div>
         </div>
+
+        {/* Tab bar */}
+        <div className="bg-[oklch(0.35_0.12_251)] border-t border-[oklch(0.30_0.10_251)]">
+          <div className="max-w-6xl mx-auto px-2 flex overflow-x-auto scrollbar-none">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-1.5 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold whitespace-nowrap transition-all border-b-2 flex-shrink-0 ${
+                  activeTab === tab.id
+                    ? "border-white text-white"
+                    : "border-transparent text-white/60 hover:text-white/90"
+                }`}
+                data-ocid="nav.tab"
+              >
+                {tab.icon}
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.label.split(" ")[0]}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       </header>
 
-      <main
-        className="flex-1 max-w-6xl mx-auto w-full px-4 py-6"
-        data-ocid="main.section"
-      >
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Left: Day navigator + tasks */}
-          <div className="flex-1 flex flex-col gap-5">
-            {/* Day Navigator */}
-            <div
-              className="bg-primary text-primary-foreground rounded-2xl px-4 py-3 flex items-center gap-3 shadow-card"
-              data-ocid="day.panel"
+      {/* Tab content */}
+      <main className="flex-1" data-ocid="main.section">
+        <AnimatePresence mode="wait">
+          {activeTab === "study" && (
+            <motion.div
+              key="study"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="max-w-6xl mx-auto w-full px-4 py-6"
             >
-              <button
-                type="button"
-                onClick={goToPrev}
-                disabled={viewDay === 0}
-                className="w-9 h-9 rounded-full flex items-center justify-center bg-[oklch(1_0_0_/_0.15)] hover:bg-[oklch(1_0_0_/_0.25)] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                data-ocid="day.pagination_prev"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <div className="flex-1 text-center">
-                <p className="text-lg font-bold">Day {viewDay + 1}</p>
-                <p className="text-xs opacity-80">{getDayDateShort(viewDay)}</p>
-              </div>
-              <button
-                type="button"
-                onClick={goToNext}
-                disabled={viewDay === TOTAL_DAYS - 1}
-                className="w-9 h-9 rounded-full flex items-center justify-center bg-[oklch(1_0_0_/_0.15)] hover:bg-[oklch(1_0_0_/_0.25)] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                data-ocid="day.pagination_next"
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
-
-            {/* Phase badge */}
-            <div className="flex items-center gap-2">
-              <Badge
-                className="bg-[oklch(0.93_0.04_251)] text-[oklch(0.38_0.14_251)] border border-[oklch(0.82_0.08_251)] text-xs px-3 py-1"
-                data-ocid="phase.tab"
-              >
-                <Target size={12} className="mr-1.5" />
-                {phase}
-              </Badge>
-              {isToday && (
-                <Badge className="bg-success text-success-foreground text-xs px-3 py-1">
-                  আজকের দিন
-                </Badge>
-              )}
-            </div>
-
-            {/* Task Cards */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={viewDay}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.25 }}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-                data-ocid="task.list"
-              >
-                {tasks.length === 0 ? (
+              <div className="flex flex-col lg:flex-row gap-6">
+                {/* Left: Day navigator + tasks */}
+                <div className="flex-1 flex flex-col gap-5">
+                  {/* Day Navigator */}
                   <div
-                    className="col-span-3 bg-white rounded-xl border p-10 text-center text-muted-foreground"
-                    data-ocid="task.empty_state"
+                    className="bg-primary text-primary-foreground rounded-2xl px-4 py-3 flex items-center gap-3 shadow-card"
+                    data-ocid="day.panel"
                   >
-                    <CalendarDays
-                      size={40}
-                      className="mx-auto mb-3 opacity-30"
-                    />
-                    <p className="font-medium">এই দিনের কোনো টাস্ক নেই।</p>
-                  </div>
-                ) : (
-                  tasks.map((task, slotIndex) => (
-                    <TaskCard
-                      key={`task-${viewDay}-${task}`}
-                      task={task}
-                      slotIndex={slotIndex}
-                      dayIndex={viewDay}
-                      status={statuses[slotIndex]}
-                      onMark={markCompleted}
-                      todayIndex={todayIndex}
-                    />
-                  ))
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Sidebar */}
-          <aside
-            className="lg:w-72 flex flex-col gap-4"
-            data-ocid="sidebar.panel"
-          >
-            {/* Stats */}
-            <div className="bg-white rounded-xl border shadow-card p-5">
-              <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-                <BarChart3 size={16} className="text-primary" />
-                সামগ্রিক অগ্রগতি
-              </h3>
-              <div className="space-y-3">
-                <div
-                  className="flex items-center justify-between"
-                  data-ocid="stats.row"
-                >
-                  <span className="text-sm text-muted-foreground flex items-center gap-2">
-                    <CheckCircle2 size={14} className="text-success" />
-                    সম্পন্ন
-                  </span>
-                  <Badge className="bg-success-bg text-success border-0 font-bold">
-                    {stats.completed}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground flex items-center gap-2">
-                    <XCircle size={14} className="text-destructive" />
-                    মিস হয়েছে
-                  </span>
-                  <Badge className="bg-danger-bg text-destructive border-0 font-bold">
-                    {stats.missed}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground flex items-center gap-2">
-                    <Clock size={14} className="text-pending" />
-                    বাকি
-                  </span>
-                  <Badge className="bg-pending-bg text-pending border-0 font-bold">
-                    {stats.pending}
-                  </Badge>
-                </div>
-                <div className="pt-2 border-t border-border">
-                  <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
-                    <span>সম্পূর্ণতা</span>
-                    <span className="font-semibold text-primary">
-                      {progressPct}%
-                    </span>
-                  </div>
-                  <Progress value={progressPct} className="h-2" />
-                </div>
-              </div>
-            </div>
-
-            {/* Phase info */}
-            <div className="bg-white rounded-xl border shadow-card p-5">
-              <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-                <Target size={16} className="text-primary" />
-                বর্তমান ফেজ
-              </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {phase}
-              </p>
-              <div className="mt-3 text-xs">
-                <span className="text-muted-foreground">দেখছেন: </span>
-                <span className="font-semibold text-primary">
-                  {getDayDate(viewDay)}
-                </span>
-              </div>
-            </div>
-
-            {/* Go to today */}
-            {!isToday && (
-              <Button
-                onClick={goToToday}
-                className="w-full bg-primary text-primary-foreground hover:bg-[oklch(0.44_0.14_251)]"
-                data-ocid="today.primary_button"
-              >
-                <CalendarDays size={16} className="mr-2" />
-                আজকে ফিরে যাও
-              </Button>
-            )}
-
-            {/* Motivational quote */}
-            <div className="bg-[oklch(0.96_0.04_251)] rounded-xl border border-[oklch(0.88_0.06_251)] p-5">
-              <p className="text-xs font-semibold text-primary mb-1">
-                অনুপ্রেরণা 💙
-              </p>
-              <p className="text-sm text-foreground leading-relaxed italic">
-                &ldquo;{QUOTES[quoteIndex]}&rdquo;
-              </p>
-            </div>
-
-            {/* Day range quick nav */}
-            <div className="bg-white rounded-xl border shadow-card p-5">
-              <h3 className="text-sm font-bold text-foreground mb-3">
-                দ্রুত নেভিগেশন
-              </h3>
-              <div className="grid grid-cols-7 gap-1">
-                {Array.from({ length: Math.min(7, TOTAL_DAYS) }, (_, i) => {
-                  const d = Math.max(0, todayIndex - 3) + i;
-                  if (d >= TOTAL_DAYS) return null;
-                  const isActive = d === viewDay;
-                  const isT = d === todayIndex;
-                  return (
                     <button
                       type="button"
-                      key={d}
-                      onClick={() => setViewDay(d)}
-                      className={`text-xs py-1.5 rounded-lg font-medium transition-all ${
-                        isActive
-                          ? "bg-primary text-primary-foreground"
-                          : isT
-                            ? "bg-[oklch(0.93_0.04_251)] text-primary border border-[oklch(0.82_0.08_251)]"
-                            : "bg-secondary text-secondary-foreground hover:bg-[oklch(0.88_0.03_251)]"
-                      }`}
-                      data-ocid={`nav.button.${i + 1}`}
+                      onClick={goToPrev}
+                      disabled={viewDay === 0}
+                      className="w-9 h-9 rounded-full flex items-center justify-center bg-[oklch(1_0_0_/_0.15)] hover:bg-[oklch(1_0_0_/_0.25)] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                      data-ocid="day.pagination_prev"
                     >
-                      {d + 1}
+                      <ChevronLeft size={20} />
                     </button>
-                  );
-                })}
+                    <div className="flex-1 text-center">
+                      <p className="text-lg font-bold">Day {viewDay + 1}</p>
+                      <p className="text-xs opacity-80">
+                        {getDayDateShort(viewDay)}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={goToNext}
+                      disabled={viewDay === TOTAL_DAYS - 1}
+                      className="w-9 h-9 rounded-full flex items-center justify-center bg-[oklch(1_0_0_/_0.15)] hover:bg-[oklch(1_0_0_/_0.25)] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                      data-ocid="day.pagination_next"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+
+                  {/* Phase badge */}
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      className="bg-[oklch(0.93_0.04_251)] text-[oklch(0.38_0.14_251)] border border-[oklch(0.82_0.08_251)] text-xs px-3 py-1"
+                      data-ocid="phase.tab"
+                    >
+                      <Target size={12} className="mr-1.5" />
+                      {phase}
+                    </Badge>
+                    {isToday && (
+                      <Badge className="bg-success text-success-foreground text-xs px-3 py-1">
+                        আজকের দিন
+                      </Badge>
+                    )}
+                  </div>
+
+                  {/* Task Cards */}
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={viewDay}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.25 }}
+                      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+                      data-ocid="task.list"
+                    >
+                      {tasks.length === 0 ? (
+                        <div
+                          className="col-span-3 bg-white rounded-xl border p-10 text-center text-muted-foreground"
+                          data-ocid="task.empty_state"
+                        >
+                          <CalendarDays
+                            size={40}
+                            className="mx-auto mb-3 opacity-30"
+                          />
+                          <p className="font-medium">এই দিনের কোনো টাস্ক নেই।</p>
+                        </div>
+                      ) : (
+                        tasks.map((task, slotIndex) => (
+                          <TaskCard
+                            key={`task-${viewDay}-${task}`}
+                            task={task}
+                            slotIndex={slotIndex}
+                            dayIndex={viewDay}
+                            status={statuses[slotIndex]}
+                            onMark={markCompleted}
+                            todayIndex={todayIndex}
+                          />
+                        ))
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* Sidebar */}
+                <aside
+                  className="lg:w-72 flex flex-col gap-4"
+                  data-ocid="sidebar.panel"
+                >
+                  {/* Stats */}
+                  <div className="bg-white rounded-xl border shadow-card p-5">
+                    <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+                      <BarChart3 size={16} className="text-primary" />
+                      সামগ্রিক অগ্রগতি
+                    </h3>
+                    <div className="space-y-3">
+                      <div
+                        className="flex items-center justify-between"
+                        data-ocid="stats.row"
+                      >
+                        <span className="text-sm text-muted-foreground flex items-center gap-2">
+                          <CheckCircle2 size={14} className="text-success" />
+                          সম্পন্ন
+                        </span>
+                        <Badge className="bg-success-bg text-success border-0 font-bold">
+                          {stats.completed}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground flex items-center gap-2">
+                          <XCircle size={14} className="text-destructive" />
+                          মিস হয়েছে
+                        </span>
+                        <Badge className="bg-danger-bg text-destructive border-0 font-bold">
+                          {stats.missed}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground flex items-center gap-2">
+                          <Clock size={14} className="text-pending" />
+                          বাকি
+                        </span>
+                        <Badge className="bg-pending-bg text-pending border-0 font-bold">
+                          {stats.pending}
+                        </Badge>
+                      </div>
+                      <div className="pt-2 border-t border-border">
+                        <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
+                          <span>সম্পূর্ণতা</span>
+                          <span className="font-semibold text-primary">
+                            {progressPct}%
+                          </span>
+                        </div>
+                        <Progress value={progressPct} className="h-2" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Phase info */}
+                  <div className="bg-white rounded-xl border shadow-card p-5">
+                    <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+                      <Target size={16} className="text-primary" />
+                      বর্তমান ফেজ
+                    </h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {phase}
+                    </p>
+                    <div className="mt-3 text-xs">
+                      <span className="text-muted-foreground">দেখছেন: </span>
+                      <span className="font-semibold text-primary">
+                        {getDayDate(viewDay)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Go to today */}
+                  {!isToday && (
+                    <Button
+                      onClick={goToToday}
+                      className="w-full bg-primary text-primary-foreground hover:bg-[oklch(0.44_0.14_251)]"
+                      data-ocid="today.primary_button"
+                    >
+                      <CalendarDays size={16} className="mr-2" />
+                      আজকে ফিরে যাও
+                    </Button>
+                  )}
+
+                  {/* Motivational quote */}
+                  <div className="bg-[oklch(0.96_0.04_251)] rounded-xl border border-[oklch(0.88_0.06_251)] p-5">
+                    <p className="text-xs font-semibold text-primary mb-1">
+                      অনুপ্রেরণা 💙
+                    </p>
+                    <p className="text-sm text-foreground leading-relaxed italic">
+                      &ldquo;{QUOTES[quoteIndex]}&rdquo;
+                    </p>
+                  </div>
+
+                  {/* Day range quick nav */}
+                  <div className="bg-white rounded-xl border shadow-card p-5">
+                    <h3 className="text-sm font-bold text-foreground mb-3">
+                      দ্রুত নেভিগেশন
+                    </h3>
+                    <div className="grid grid-cols-7 gap-1">
+                      {Array.from(
+                        { length: Math.min(7, TOTAL_DAYS) },
+                        (_, i) => {
+                          const d = Math.max(0, todayIndex - 3) + i;
+                          if (d >= TOTAL_DAYS) return null;
+                          const isActive = d === viewDay;
+                          const isT = d === todayIndex;
+                          return (
+                            <button
+                              type="button"
+                              key={d}
+                              onClick={() => setViewDay(d)}
+                              className={`text-xs py-1.5 rounded-lg font-medium transition-all ${
+                                isActive
+                                  ? "bg-primary text-primary-foreground"
+                                  : isT
+                                    ? "bg-[oklch(0.93_0.04_251)] text-primary border border-[oklch(0.82_0.08_251)]"
+                                    : "bg-secondary text-secondary-foreground hover:bg-[oklch(0.88_0.03_251)]"
+                              }`}
+                              data-ocid={`nav.button.${i + 1}`}
+                            >
+                              {d + 1}
+                            </button>
+                          );
+                        },
+                      )}
+                    </div>
+                  </div>
+                </aside>
               </div>
-            </div>
-          </aside>
-        </div>
+            </motion.div>
+          )}
+
+          {activeTab === "routine" && (
+            <motion.div
+              key="routine"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="max-w-6xl mx-auto w-full px-4"
+            >
+              <DailyRoutine />
+            </motion.div>
+          )}
+
+          {activeTab === "calendar" && (
+            <motion.div
+              key="calendar"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="max-w-6xl mx-auto w-full px-4"
+            >
+              <CalendarView />
+            </motion.div>
+          )}
+
+          {activeTab === "stopwatch" && (
+            <motion.div
+              key="stopwatch"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="max-w-6xl mx-auto w-full px-4"
+            >
+              <Stopwatch />
+            </motion.div>
+          )}
+
+          {activeTab === "countdown" && (
+            <motion.div
+              key="countdown"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="max-w-6xl mx-auto w-full px-4"
+            >
+              <CountdownTimer />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
       <footer className="bg-white border-t border-border mt-4">
