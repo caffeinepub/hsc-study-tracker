@@ -81,6 +81,8 @@ export function useStudyTracker() {
 
   return {
     todayIndex,
+    data,
+    setData,
     getStatus,
     markCompleted,
     getDayStatuses,

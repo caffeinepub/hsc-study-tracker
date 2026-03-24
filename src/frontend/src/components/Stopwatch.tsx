@@ -115,7 +115,7 @@ export default function Stopwatch() {
           className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all shadow-md hover:scale-105 active:scale-95 ${
             running
               ? "bg-amber-500 hover:bg-amber-600 text-white"
-              : "bg-primary hover:bg-[oklch(0.44_0.14_251)] text-primary-foreground"
+              : "bg-primary hover:bg-[oklch(0.44_0.14_251)] dark:hover:bg-[oklch(0.72_0.16_251)] text-primary-foreground"
           }`}
           data-ocid="stopwatch.toggle"
         >
@@ -135,7 +135,7 @@ export default function Stopwatch() {
           type="button"
           onClick={reset}
           disabled={elapsed === 0}
-          className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 transition-all shadow-md hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 text-gray-700 transition-all shadow-md hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
           data-ocid="stopwatch.delete_button"
         >
           <RotateCcw size={16} /> রিসেট
@@ -149,10 +149,10 @@ export default function Stopwatch() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="bg-white rounded-xl border shadow-sm overflow-hidden"
+            className="bg-card rounded-xl border shadow-sm overflow-hidden"
             data-ocid="stopwatch.list"
           >
-            <div className="px-4 py-3 border-b bg-gray-50">
+            <div className="px-4 py-3 border-b bg-secondary">
               <h3 className="text-sm font-bold text-foreground">ল্যাপ তালিকা</h3>
             </div>
             <div className="max-h-64 overflow-y-auto">
@@ -166,7 +166,7 @@ export default function Stopwatch() {
                     key={lapTime}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center justify-between px-4 py-2.5 border-b last:border-0 hover:bg-gray-50"
+                    className="flex items-center justify-between px-4 py-2.5 border-b last:border-0 hover:bg-secondary/50"
                     data-ocid={`stopwatch.item.${idx}`}
                   >
                     <span className="text-sm font-medium text-muted-foreground">

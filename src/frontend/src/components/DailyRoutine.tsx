@@ -91,31 +91,34 @@ const routineItems: RoutineItem[] = [
 
 const typeStyles = {
   study: {
-    card: "bg-blue-50 border-blue-200",
+    card: "bg-blue-50 border-blue-200 dark:bg-blue-950/40 dark:border-blue-800/50",
     dot: "bg-blue-500",
-    icon: "bg-blue-100 text-blue-600",
-    badge: "bg-blue-100 text-blue-700",
+    icon: "bg-blue-100 text-blue-600 dark:bg-blue-900/60 dark:text-blue-300",
+    badge: "bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300",
     line: "bg-blue-200",
   },
   prayer: {
-    card: "bg-emerald-50 border-emerald-200",
+    card: "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-800/50",
     dot: "bg-emerald-500",
-    icon: "bg-emerald-100 text-emerald-600",
-    badge: "bg-emerald-100 text-emerald-700",
+    icon: "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/60 dark:text-emerald-300",
+    badge:
+      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300",
     line: "bg-emerald-200",
   },
   rest: {
-    card: "bg-amber-50 border-amber-200",
+    card: "bg-amber-50 border-amber-200 dark:bg-amber-950/40 dark:border-amber-800/50",
     dot: "bg-amber-500",
-    icon: "bg-amber-100 text-amber-600",
-    badge: "bg-amber-100 text-amber-700",
+    icon: "bg-amber-100 text-amber-600 dark:bg-amber-900/60 dark:text-amber-300",
+    badge:
+      "bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300",
     line: "bg-amber-200",
   },
   sleep: {
-    card: "bg-purple-50 border-purple-200",
+    card: "bg-purple-50 border-purple-200 dark:bg-purple-950/40 dark:border-purple-800/50",
     dot: "bg-purple-500",
-    icon: "bg-purple-100 text-purple-600",
-    badge: "bg-purple-100 text-purple-700",
+    icon: "bg-purple-100 text-purple-600 dark:bg-purple-900/60 dark:text-purple-300",
+    badge:
+      "bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300",
     line: "bg-purple-200",
   },
 };
@@ -137,13 +140,13 @@ export default function DailyRoutine() {
           আদর্শ HSC শিক্ষার্থীর দৈনিক সময়সূচি
         </p>
         <div className="mt-4 flex justify-center gap-4 flex-wrap">
-          <span className="flex items-center gap-1.5 text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full font-medium">
+          <span className="flex items-center gap-1.5 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 px-3 py-1.5 rounded-full font-medium">
             <Book size={12} /> পড়ার সময়: {studyHours} ঘণ্টা
           </span>
-          <span className="flex items-center gap-1.5 text-xs bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full font-medium">
+          <span className="flex items-center gap-1.5 text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 px-3 py-1.5 rounded-full font-medium">
             <Utensils size={12} /> নামাজ ও খাবার: ৩.৫ ঘণ্টা
           </span>
-          <span className="flex items-center gap-1.5 text-xs bg-purple-100 text-purple-700 px-3 py-1.5 rounded-full font-medium">
+          <span className="flex items-center gap-1.5 text-xs bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300 px-3 py-1.5 rounded-full font-medium">
             <Moon size={12} /> ঘুম: ৬ ঘণ্টা
           </span>
         </div>
@@ -167,7 +170,7 @@ export default function DailyRoutine() {
                 {/* Timeline dot */}
                 <div className="relative z-10 flex-shrink-0 w-16 flex flex-col items-center">
                   <div
-                    className={`w-8 h-8 rounded-full ${s.icon} flex items-center justify-center shadow-sm border border-white`}
+                    className={`w-8 h-8 rounded-full ${s.icon} flex items-center justify-center shadow-sm border border-white/20`}
                   >
                     {item.icon}
                   </div>

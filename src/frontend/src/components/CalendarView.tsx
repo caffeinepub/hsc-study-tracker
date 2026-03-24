@@ -68,14 +68,16 @@ export default function CalendarView() {
   function getDayColor(dayIndex: number) {
     const statuses = getDayStatuses(dayIndex);
     const tasks = getTasksForDay(dayIndex);
-    if (tasks.length === 0) return "bg-gray-100 text-gray-400";
+    if (tasks.length === 0)
+      return "bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500";
     const completed = statuses.filter((s) => s === 1).length;
     const missed = statuses.filter((s) => s === 2).length;
     if (completed === tasks.length) return "bg-emerald-500 text-white";
     if (missed > 0 && completed === 0) return "bg-red-400 text-white";
     if (missed > 0) return "bg-amber-400 text-white";
-    if (dayIndex > todayIndex) return "bg-gray-100 text-gray-500";
-    return "bg-blue-100 text-blue-700";
+    if (dayIndex > todayIndex)
+      return "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400";
+    return "bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300";
   }
 
   const selectedSlots: SlotStatus[] =
@@ -93,20 +95,20 @@ export default function CalendarView() {
         <h2 className="text-2xl font-bold text-foreground mb-1">ক্যালেন্ডার</h2>
         <p className="text-sm text-muted-foreground">১৮২ দিনের পড়ার অগ্রগতি</p>
         <div className="mt-3 flex justify-center gap-3 flex-wrap text-xs">
-          <span className="flex items-center gap-1.5">
+          <span className="flex items-center gap-1.5 text-foreground">
             <span className="w-3 h-3 rounded-sm bg-emerald-500 inline-block" />{" "}
             সম্পন্ন
           </span>
-          <span className="flex items-center gap-1.5">
+          <span className="flex items-center gap-1.5 text-foreground">
             <span className="w-3 h-3 rounded-sm bg-red-400 inline-block" /> মিস
             হয়েছে
           </span>
-          <span className="flex items-center gap-1.5">
+          <span className="flex items-center gap-1.5 text-foreground">
             <span className="w-3 h-3 rounded-sm bg-amber-400 inline-block" />{" "}
             আংশিক
           </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm bg-gray-100 border inline-block" />{" "}
+          <span className="flex items-center gap-1.5 text-foreground">
+            <span className="w-3 h-3 rounded-sm bg-gray-200 dark:bg-gray-700 border inline-block" />{" "}
             ভবিষ্যৎ
           </span>
         </div>
@@ -116,14 +118,14 @@ export default function CalendarView() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="mb-5 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between"
+          className="mb-5 bg-blue-50 border border-blue-200 dark:bg-blue-950/40 dark:border-blue-800/50 rounded-xl p-4 flex items-center justify-between"
           data-ocid="calendar.panel"
         >
           <div>
-            <p className="text-sm font-bold text-blue-800">
+            <p className="text-sm font-bold text-blue-800 dark:text-blue-300">
               Day {selected + 1}
             </p>
-            <p className="text-xs text-blue-600">
+            <p className="text-xs text-blue-600 dark:text-blue-400">
               {getDateForDay(selected).toLocaleDateString("bn-BD", {
                 day: "numeric",
                 month: "long",
@@ -136,10 +138,10 @@ export default function CalendarView() {
                   key={slot}
                   className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                     status === 1
-                      ? "bg-emerald-100 text-emerald-700"
+                      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300"
                       : status === 2
-                        ? "bg-red-100 text-red-700"
-                        : "bg-gray-100 text-gray-600"
+                        ? "bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-300"
+                        : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                   }`}
                 >
                   টপিক {slot + 1}:{" "}
@@ -151,7 +153,7 @@ export default function CalendarView() {
           <button
             type="button"
             onClick={() => setSelected(null)}
-            className="text-blue-400 hover:text-blue-600 text-lg font-bold px-2"
+            className="text-blue-400 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-200 text-lg font-bold px-2"
           >
             ✕
           </button>
@@ -168,7 +170,7 @@ export default function CalendarView() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: gi * 0.05 }}
-              className="bg-white rounded-xl border shadow-sm p-5"
+              className="bg-card rounded-xl border shadow-sm p-5"
             >
               <h3 className="font-bold text-base text-foreground mb-4">
                 {BN_MONTHS[group.month]} {group.year}
@@ -200,8 +202,8 @@ export default function CalendarView() {
                         relative aspect-square rounded-lg flex flex-col items-center justify-center
                         text-xs font-semibold transition-all hover:scale-105 cursor-pointer
                         ${colorClass}
-                        ${isToday ? "ring-2 ring-primary ring-offset-1" : ""}
-                        ${isSelected ? "ring-2 ring-offset-1 ring-blue-500 scale-105" : ""}
+                        ${isToday ? "ring-2 ring-primary ring-offset-1 dark:ring-offset-gray-900" : ""}
+                        ${isSelected ? "ring-2 ring-offset-1 ring-blue-500 dark:ring-offset-gray-900 scale-105" : ""}
                       `}
                       data-ocid={`calendar.item.${dayIndex + 1}`}
                     >

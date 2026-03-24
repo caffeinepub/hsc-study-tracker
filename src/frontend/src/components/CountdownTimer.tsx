@@ -101,7 +101,7 @@ export default function CountdownTimer() {
             key={p.seconds}
             type="button"
             onClick={() => applyPreset(p.seconds)}
-            className="flex flex-col items-center py-2.5 px-3 rounded-xl border border-border bg-white hover:bg-[oklch(0.96_0.04_251)] hover:border-primary transition-all text-center group"
+            className="flex flex-col items-center py-2.5 px-3 rounded-xl border border-border bg-card hover:bg-secondary hover:border-primary transition-all text-center group"
             data-ocid="countdown.button"
           >
             <span className="text-sm font-bold text-foreground group-hover:text-primary">
@@ -146,7 +146,7 @@ export default function CountdownTimer() {
                     ),
                   )
                 }
-                className="w-16 h-14 text-center text-2xl font-bold font-mono border-2 border-border rounded-xl focus:outline-none focus:border-primary bg-white"
+                className="w-16 h-14 text-center text-2xl font-bold font-mono border-2 border-border rounded-xl focus:outline-none focus:border-primary bg-card text-foreground"
                 data-ocid="countdown.input"
               />
               <span className="text-xs text-muted-foreground">
@@ -239,7 +239,7 @@ export default function CountdownTimer() {
             type="button"
             onClick={start}
             disabled={totalConfigured === 0 && remaining === null}
-            className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm bg-primary hover:bg-[oklch(0.44_0.14_251)] text-primary-foreground transition-all shadow-md hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm bg-primary hover:bg-[oklch(0.44_0.14_251)] dark:hover:bg-[oklch(0.72_0.16_251)] text-primary-foreground transition-all shadow-md hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
             data-ocid="countdown.primary_button"
           >
             <Play size={16} /> শুরু করো
@@ -258,7 +258,7 @@ export default function CountdownTimer() {
           type="button"
           onClick={reset}
           disabled={remaining === null && !finished}
-          className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 transition-all shadow-md hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 text-gray-700 transition-all shadow-md hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
           data-ocid="countdown.delete_button"
         >
           <RotateCcw size={16} /> রিসেট
@@ -269,7 +269,7 @@ export default function CountdownTimer() {
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mt-4 text-sm font-semibold text-emerald-600"
+          className="text-center mt-4 text-sm font-semibold text-emerald-500"
         >
           অভিনন্দন! তুমি সেশন সম্পন্ন করেছো 🌟
         </motion.p>
